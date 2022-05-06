@@ -962,9 +962,9 @@ class CameraPickerState extends State<CameraPicker>
       height: 118,
       child: Row(
         children: <Widget>[
-          if (controller?.value.isRecordingVideo != true)
-            Expanded(child: backButton(context, constraints))
-          else
+          // if (controller?.value.isRecordingVideo != true)
+          //   Expanded(child: backButton(context, constraints))
+          // else
             const Spacer(),
           Expanded(
             child: Center(
@@ -1342,6 +1342,7 @@ class CameraPickerState extends State<CameraPicker>
       child: Stack(
         children: <Widget>[
           Positioned.fill(
+            bottom: MediaQuery.of(context).size.height * 0.175,
             child: _cameraPreview(
               context,
               orientation: value.deviceOrientation,
@@ -1367,7 +1368,7 @@ class CameraPickerState extends State<CameraPicker>
               child: settingsAction(context),
             ),
             const Spacer(),
-            ExcludeSemantics(child: tipsTextWidget(_controller)),
+           // ExcludeSemantics(child: tipsTextWidget(_controller)),
             Semantics(
               sortKey: const OrdinalSortKey(2),
               hidden: _controller == null,
