@@ -1338,26 +1338,24 @@ class CameraPickerState extends State<CameraPicker>
     required CameraValue value,
     required BoxConstraints constraints,
   }) {
-    return RepaintBoundary(
-      child: Stack(
-        children: <Widget>[
-          Positioned.fill(
-            bottom: MediaQuery.of(context).size.height * 0.175,
-            child: _cameraPreview(
-              context,
-              orientation: value.deviceOrientation,
-              constraints: constraints,
-            ),
+    return Stack(
+      children: <Widget>[
+        Positioned.fill(
+          child: _cameraPreview(
+            context,
+            orientation: value.deviceOrientation,
+            constraints: constraints,
           ),
-          if (config.foregroundBuilder != null)
-            Positioned.fill(child: config.foregroundBuilder!(context, value)),
-        ],
-      ),
+        ),
+        if (config.foregroundBuilder != null)
+          Positioned.fill(child: config.foregroundBuilder!(context, value)),
+      ],
     );
   }
 
   Widget _contentBuilder(BoxConstraints constraints) {
     return SafeArea(
+      bottom: true,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 20.0),
         child: Column(
@@ -1417,5 +1415,40 @@ class CameraPickerState extends State<CameraPicker>
         ),
       ),
     );
+    // return AnnotatedRegion<SystemUiOverlayStyle>(
+    //   value: SystemUiOverlayStyle.light,
+    //   child: Theme(
+    //     data: theme,
+    //     child: Material(
+    //       color: Colors.black,
+    //       child: RotatedBox(
+    //         quarterTurns: config.cameraQuarterTurns,
+    //         child: LayoutBuilder(
+    //           builder: (BuildContext c, BoxConstraints constraints) => Stack(
+    //             fit: StackFit.expand,
+    //             alignment: Alignment.center,
+    //             children: <Widget>[
+    //               ExcludeSemantics(
+    //                 child: _initializeWrapper(
+    //                   builder: (CameraValue value, __) => _cameraBuilder(
+    //                     context: c,
+    //                     value: value,
+    //                     constraints: constraints,
+    //                   ),
+    //                 ),
+    //               ),
+    //               if (enableSetExposure)
+    //                 _exposureDetectorWidget(c, constraints),
+    //               _initializeWrapper(
+    //                 builder: (_, __) => _focusingAreaWidget(constraints),
+    //               ),
+    //               _contentBuilder(constraints),
+    //             ],
+    //           ),
+    //         ),
+    //       ),
+    //     ),
+    //   ),
+    // );
   }
 }
