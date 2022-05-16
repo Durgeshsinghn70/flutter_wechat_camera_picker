@@ -872,20 +872,52 @@ class CameraPickerState extends State<CameraPicker>
   ///
   /// This displayed at the top of the screen.
   /// 该区域显示在屏幕上方。
+  bool? flashOff = true;
   Widget settingsAction(BuildContext context) {
     return _initializeWrapper(
       builder: (CameraValue v, __) {
         if (v.isRecordingVideo) {
           return const SizedBox.shrink();
         }
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0),
-          child: Row(
-            children: <Widget>[
-              if (cameras.length > 1) switchCamerasButton,
-              const Spacer(),
-              switchFlashesButton(v),
-            ],
+        return Container(
+          color: Colors.black,
+          height: 53,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: Row(
+              children: <Widget>[
+                // if (cameras.length > 1) switchCamerasButton,
+                // const Spacer(),
+                if (flashOff == true) IconButton(
+                onPressed: (){
+                  controller.setFlashMode(FlashMode.off);
+                  setState(() {
+                    flashOff = false;
+                  });
+
+                },
+              //tooltip: _textDelegate.sFlashModeLabel(FlashMode.off),
+              icon: Icon(Icons.flash_on_outlined, size: 24),
+            ) else IconButton(
+                  onPressed: (){
+                    controller.setFlashMode(FlashMode.always);
+                    setState(() {
+                      flashOff = true;
+                    });
+
+                  },
+                  //tooltip: _textDelegate.sFlashModeLabel(FlashMode.always),
+                  icon: Icon(Icons.add, size: 24),
+                ),
+            Spacer(),
+            Padding(
+              padding: const EdgeInsets.only(right: 34.0),
+              child: Text('Underscore', style: TextStyle(color: Colors.white, fontSize: 23),),
+            ),
+            Spacer(),
+            //    switchFlashesButton(v),
+              ],
+            ),
           ),
         );
       },
@@ -895,16 +927,19 @@ class CameraPickerState extends State<CameraPicker>
   /// The button to switch between cameras.
   /// 切换相机的按钮
   Widget get switchCamerasButton {
-    return IconButton(
-      tooltip: _textDelegate.sSwitchCameraLensDirectionLabel(
-        _nextCameraDescription.lensDirection,
-      ),
-      onPressed: switchCameras,
-      icon: Icon(
-        Platform.isIOS
-            ? Icons.flip_camera_ios_outlined
-            : Icons.flip_camera_android_outlined,
-        size: 24,
+    return Padding(
+      padding: const EdgeInsets.only(right: 15.0),
+      child: IconButton(
+        tooltip: _textDelegate.sSwitchCameraLensDirectionLabel(
+          _nextCameraDescription.lensDirection,
+        ),
+        onPressed: switchCameras,
+        icon: Icon(
+          Platform.isIOS
+              ? Icons.flip_camera_ios_outlined
+              : Icons.flip_camera_android_outlined,
+          size: 24,
+        ),
       ),
     );
   }
@@ -961,17 +996,19 @@ class CameraPickerState extends State<CameraPicker>
     return SizedBox(
       height: 118,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           // if (controller?.value.isRecordingVideo != true)
           //   Expanded(child: backButton(context, constraints))
           // else
-            const Spacer(),
-          Expanded(
-            child: Center(
-              child: MergeSemantics(child: shootingButton(constraints)),
-            ),
+         const Spacer(),
+          Padding(
+            padding: const EdgeInsets.only(left: 50.0),
+            child: MergeSemantics(child: shootingButton(constraints)),
           ),
           const Spacer(),
+          if (cameras.length > 1) switchCamerasButton,
         ],
       ),
     );
@@ -1020,6 +1057,7 @@ class CameraPickerState extends State<CameraPicker>
               children: <Widget>[
                 Center(
                   child: AnimatedContainer(
+                    margin: const EdgeInsets.only(top: 20),
                     duration: kThemeChangeDuration,
                     width: isShootingButtonAnimate
                         ? outerSize.width
@@ -1366,7 +1404,7 @@ class CameraPickerState extends State<CameraPicker>
               child: settingsAction(context),
             ),
             const Spacer(),
-           // ExcludeSemantics(child: tipsTextWidget(_controller)),
+            // ExcludeSemantics(child: tipsTextWidget(_controller)),
             Semantics(
               sortKey: const OrdinalSortKey(2),
               hidden: _controller == null,
@@ -1378,37 +1416,40 @@ class CameraPickerState extends State<CameraPicker>
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
-      child: Theme(
-        data: theme,
-        child: Material(
-          color: Colors.black,
-          child: RotatedBox(
-            quarterTurns: config.cameraQuarterTurns,
-            child: LayoutBuilder(
-              builder: (BuildContext c, BoxConstraints constraints) => Stack(
-                fit: StackFit.expand,
-                alignment: Alignment.center,
-                children: <Widget>[
-                  ExcludeSemantics(
-                    child: _initializeWrapper(
-                      builder: (CameraValue value, __) => _cameraBuilder(
-                        context: c,
-                        value: value,
-                        constraints: constraints,
+    return SafeArea(
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.light,
+        child: Theme(
+          data: theme,
+          child: Material(
+            color: Colors.black,
+            child: RotatedBox(
+              quarterTurns: config.cameraQuarterTurns,
+              child: LayoutBuilder(
+                builder: (BuildContext c, BoxConstraints constraints) => Stack(
+                  fit: StackFit.expand,
+                  alignment: Alignment.center,
+                  children: <Widget>[
+                    ExcludeSemantics(
+                      child: _initializeWrapper(
+                        builder: (CameraValue value, __) => _cameraBuilder(
+                          context: c,
+                          value: value,
+                          constraints: constraints,
+                        ),
                       ),
                     ),
-                  ),
-                  if (enableSetExposure)
-                    _exposureDetectorWidget(c, constraints),
-                  _initializeWrapper(
-                    builder: (_, __) => _focusingAreaWidget(constraints),
-                  ),
-                  _contentBuilder(constraints),
-                ],
+                    if (enableSetExposure)
+                      _exposureDetectorWidget(c, constraints),
+                    _initializeWrapper(
+                      builder: (_, __) => _focusingAreaWidget(constraints),
+                    ),
+                    _contentBuilder(constraints),
+                  ],
+                ),
               ),
             ),
           ),
